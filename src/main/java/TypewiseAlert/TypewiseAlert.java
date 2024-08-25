@@ -3,15 +3,15 @@ package TypewiseAlert;
 public class TypewiseAlert {
     public enum BreachType {
         NORMAL, TOO_LOW, TOO_HIGH
-    };
+    }
 
     public enum CoolingType {
         PASSIVE_COOLING, HI_ACTIVE_COOLING, MED_ACTIVE_COOLING
-    };
+    }
 
     public enum AlertTarget {
         TO_CONTROLLER, TO_EMAIL
-    };
+    }
 
     public static BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
         if (value < lowerLimit) {
@@ -28,17 +28,15 @@ public class TypewiseAlert {
     }
 
     private static int[] getLimitsForCoolingType(CoolingType coolingType) {
-        switch (coolingType) {
-            case PASSIVE_COOLING:
-                return new int[]{0, 35};
-            case HI_ACTIVE_COOLING:
-                return new int[]{0, 45};
-            case MED_ACTIVE_COOLING:
-                return new int[]{0, 40};
-            default:
-                throw new IllegalArgumentException("Invalid Cooling Type");
-        }
+        if (coolingType == CoolingType.PASSIVE_COOLING) return getLimitsForPassiveCooling();
+        if (coolingType == CoolingType.HI_ACTIVE_COOLING) return getLimitsForHiActiveCooling();
+        if (coolingType == CoolingType.MED_ACTIVE_COOLING) return getLimitsForMedActiveCooling();
+        throw new IllegalArgumentException("Invalid Cooling Type");
     }
+
+    private static int[] getLimitsForPassiveCooling() { return new int[]{0, 35}; }
+    private static int[] getLimitsForHiActiveCooling() { return new int[]{0, 45}; }
+    private static int[] getLimitsForMedActiveCooling() { return new int[]{0, 40}; }
 
     public static void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
         BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
@@ -46,16 +44,8 @@ public class TypewiseAlert {
     }
 
     private static void sendAlert(AlertTarget alertTarget, BreachType breachType) {
-        switch (alertTarget) {
-            case TO_CONTROLLER:
-                sendToController(breachType);
-                break;
-            case TO_EMAIL:
-                sendToEmail(breachType);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid Alert Target");
-        }
+        if (alertTarget == AlertTarget.TO_CONTROLLER) sendToController(breachType);
+        if (alertTarget == AlertTarget.TO_EMAIL) sendToEmail(breachType);
     }
 
     private static void sendToController(BreachType breachType) {
