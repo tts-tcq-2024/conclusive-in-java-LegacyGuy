@@ -46,7 +46,7 @@ public class TypewiseAlert {
         sendAlert(alertTarget, breachType);
     }
 
-    private static void sendAlert(AlertTarget alertTarget, BreachType breachType) {
+    static void sendAlert(AlertTarget alertTarget, BreachType breachType) {
         if (alertTarget == AlertTarget.TO_CONTROLLER) {
             sendToController(breachType);
         } else if (alertTarget == AlertTarget.TO_EMAIL) {
@@ -54,12 +54,12 @@ public class TypewiseAlert {
         }
     }
 
-    private static void sendToController(BreachType breachType) {
+    static void sendToController(BreachType breachType) {
         int header = 0xfeed;
         System.out.printf("%x : %s\n", header, breachType);
     }
 
-    private static void sendToEmail(BreachType breachType) {
+    static void sendToEmail(BreachType breachType) {
         String recipient = "a.b@c.com";
         if (breachType != BreachType.NORMAL) {
             System.out.printf("To: %s\n", recipient);
