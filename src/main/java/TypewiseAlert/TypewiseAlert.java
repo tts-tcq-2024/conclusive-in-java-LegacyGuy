@@ -1,5 +1,8 @@
 package TypewiseAlert;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 public class TypewiseAlert {
     public enum BreachType {
         NORMAL, TOO_LOW, TOO_HIGH
@@ -11,6 +14,13 @@ public class TypewiseAlert {
 
     public enum AlertTarget {
         TO_CONTROLLER, TO_EMAIL
+    }
+
+    private static final Map<CoolingType, int[]> coolingLimits = new EnumMap<>(CoolingType.class);
+    static {
+        coolingLimits.put(CoolingType.PASSIVE_COOLING, new int[]{0, 35});
+        coolingLimits.put(CoolingType.HI_ACTIVE_COOLING, new int[]{0, 45});
+        coolingLimits.put(CoolingType.MED_ACTIVE_COOLING, new int[]{0, 40});
     }
 
     public static BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
@@ -28,15 +38,8 @@ public class TypewiseAlert {
     }
 
     private static int[] getLimitsForCoolingType(CoolingType coolingType) {
-        if (coolingType == CoolingType.PASSIVE_COOLING) return getLimitsForPassiveCooling();
-        if (coolingType == CoolingType.HI_ACTIVE_COOLING) return getLimitsForHiActiveCooling();
-        if (coolingType == CoolingType.MED_ACTIVE_COOLING) return getLimitsForMedActiveCooling();
-        throw new IllegalArgumentException("Invalid Cooling Type");
+        return coolingLimits.getOrDefault(coolingType, new int[]{0, 0});
     }
-
-    private static int[] getLimitsForPassiveCooling() { return new int[]{0, 35}; }
-    private static int[] getLimitsForHiActiveCooling() { return new int[]{0, 45}; }
-    private static int[] getLimitsForMedActiveCooling() { return new int[]{0, 40}; }
 
     public static void checkAndAlert(AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
         BreachType breachType = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
@@ -44,8 +47,11 @@ public class TypewiseAlert {
     }
 
     private static void sendAlert(AlertTarget alertTarget, BreachType breachType) {
-        if (alertTarget == AlertTarget.TO_CONTROLLER) sendToController(breachType);
-        if (alertTarget == AlertTarget.TO_EMAIL) sendToEmail(breachType);
+        if (alertTarget == AlertTarget.TO_CONTROLLER) {
+            sendToController(breachType);
+        } else if (alertTarget == AlertTarget.TO_EMAIL) {
+            sendToEmail(breachType);
+        }
     }
 
     private static void sendToController(BreachType breachType) {
