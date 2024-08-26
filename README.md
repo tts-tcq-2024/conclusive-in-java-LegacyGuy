@@ -42,6 +42,4 @@ You have seen a few workflows in this repository. They are quality-gates to prev
 **yes**
 
 During the next four weeks, what improvement do you plan in your code-quality practice? (in your regular work, not in this repository!)
-**Quality gates like complexity control,
-duplication checks,
-and automated testing provide clear metrics and enforceable standards that can help maintain a clean codebase.**
+****
